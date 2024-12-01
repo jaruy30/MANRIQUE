@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5; 
+    }
+    .hidden {
+      display: none;
+    }
+    #login-container, #input-container {
+      background-color: #d2b48c; 
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center; 
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input[type="text"], input[type="password"] {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #8b4513; 
+      border-radius: 4px;
+      width: calc(100% - 22px); 
+    }
+    button {
+      margin-top: 15px;
+      background-color: #8b4513; 
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #5c3a1e; 
+    }
+    #logout-button {
+      margin-top: 20px;
+    }
+    #login-error-message {
+      color: red; 
+    }
+  </style>
+</head>
+<body>
+  <div id="login-container">
+    <h2>Login</h2>
+    <label for="input-username">Username:</label>
+    <input type="text" id="input-username" required><br><br>
+    <label for="input-password">Password:</label>
+    <input type="password" id="input-password" required><br><br>
+    <button onclick="performLogin()">Login</button>
+    <p id="login-error-message"></p>
+  </div>
+
+  <div id="input-container" class="hidden">
+    <h2>Welcome!</h2>
+    <label for="input-string">Enter a string:</label>
+    <input type="text" id="input-string">
+    <button onclick="submitUserString()">Submit</button>
+    <h3>Submitted Strings:</h3>
+    <div id="output-container"></div>
+    <button id="logout-button" onclick="performLogout()">Logout</button>
+  </div>
+
+  <script>
+    const userCredentials = {
+      username: "jarvy",
+      password: "12345"
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("isLoggedIn") === "true") {
+        displayInputContainer();
+        retrieveStrings();
+      } else {
+        displayLoginContainer();
+      }
+    });
+
+    function performLogin() {
+      const username = document.getElementById("input-username").value;
+      const password = document.getElementById("input-password").value;
+
+      if (username === userCredentials.username && password === userCredentials.password) {
+        localStorage.setItem("isLoggedIn", "true");
+        displayInputContainer();
+        retrieveStrings();
+      } else {
+        document.getElementById("login-error-message").textContent = "Invalid credentials!";
+      }
+    }
+
+    function performLogout() {
+      localStorage.removeItem("isLoggedIn");
+      displayLoginContainer();
+    }
+
+    function submitUserString() {
+      const userInputString = document.getElementById("input-string").value;
+      if (userInputString) {
+        let storedStrings = JSON.parse(localStorage.getItem("storedStrings")) || [];
+        storedStrings.push(userInputString);
+        localStorage.setItem("storedStrings", JSON.stringify(storedStrings));
+        document.getElementById("input-string").value = "";
+        retrieveStrings();
+      }
+    }
+
+    function retrieveStrings() {
+      const outputDiv = document.getElementById("output-container");
+      const storedStrings = JSON.parse(localStorage.getItem("storedStrings")) || [];
+      outputDiv.innerHTML = storedStrings.map(str => `<p>${str}</p>`).join("");
+    }
+
+    function displayLoginContainer() {
+      document.getElementById("login-container").classList.remove("hidden");
+      document.getElementById("input-container").classList.add("hidden");
+    }
+
+    function displayInputContainer() {
+      document.getElementById("login-container").classList.add("hidden");
+      document.getElementById("input-container").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
